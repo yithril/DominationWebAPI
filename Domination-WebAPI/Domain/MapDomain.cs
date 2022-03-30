@@ -34,6 +34,25 @@ namespace Domination_WebAPI.Domain
 
             var nextZone = GetNextZoneCoordinate(zones);
 
+            //Create a new home for the player
+            var zoneSetup = await CreateGameZone(nextZone.Item1, nextZone.Item2);
+
+            var zone = (GameZone)zoneSetup.Result;
+
+            if (zoneSetup.Result != null)
+            {
+                //the player gets a free claim to their first zone
+                GameZoneClaim claim = new GameZoneClaim()
+                {
+                    GameZoneId = zone.Id,
+                    UserId = user.Id
+                };
+
+                _context.Add(claim);
+
+                await _context.SaveChangesAsync();
+            }
+
             return new ApiResponse(true);
         }
 
